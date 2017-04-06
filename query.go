@@ -64,6 +64,10 @@ func (filter *Filter) AddFilter(firstStep *Step, steps ...*Step) *Filter {
 func (filter *Filter) BubbleUp() *Filter {
 
 	cf := filter.GetCurrent()
+	if cf == nil {
+		return filter
+	}
+
 	filter.currentFilter = cf.parent
 
 	return filter

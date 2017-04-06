@@ -34,6 +34,13 @@ func (pf *PropertyFilter) MakeCypher(startNodeName, propertyName string) string 
 			propertyName,
 		)
 
+	case "in":
+		return fmt.Sprintf("%s.%s IN {props}.%s",
+			startNodeName,
+			pf.PropertyName,
+			propertyName,
+		)
+
 	default:
 		return ""
 	}
