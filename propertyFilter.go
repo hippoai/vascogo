@@ -2,6 +2,7 @@ package vascogo
 
 import "fmt"
 
+// PropertyFilter filters on a node property
 type PropertyFilter struct {
 	PropertyName string      `json:"propertyName"`
 	FilterType   string      `json:"filterType"`
@@ -17,7 +18,8 @@ func NewPropertyFilter(propertyName, filterType string, value interface{}) *Prop
 	}
 }
 
-func (pf *PropertyFilter) MakeCypher(startNodeName, propertyName string) string {
+// MakeCypher -
+func (pf *PropertyFilter) MakeCypher(startNodeName, propertyName string) (string, error) {
 
 	switch pf.FilterType {
 	case "equals":
@@ -25,24 +27,24 @@ func (pf *PropertyFilter) MakeCypher(startNodeName, propertyName string) string 
 			startNodeName,
 			pf.PropertyName,
 			propertyName,
-		)
+		), nil
 
 	case "regex":
 		return fmt.Sprintf("%s.%s =~ {props}.%s",
 			startNodeName,
 			pf.PropertyName,
 			propertyName,
-		)
+		), nil
 
 	case "in":
 		return fmt.Sprintf("%s.%s IN {props}.%s",
 			startNodeName,
 			pf.PropertyName,
 			propertyName,
-		)
+		), nil
 
 	default:
-		return ""
+		return "", ErrUnsupportedPropertyFilter(pf.FilterType)
 	}
 
 }

@@ -2,8 +2,10 @@ package vascogo
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
+	"github.com/hippoai/goutil"
 	"github.com/hippoai/neo4jclient"
 )
 
@@ -51,12 +53,19 @@ func (filter *Filter) shallowCypher(
 	// Add the property filters for this guy
 	pfs := []string{}
 	for _, propertyFilter := range filter.PropertiesFilter {
-		propertyIndex += 1
+		propertyIndex++
 		propertyName := getPropertyName(propertyIndex)
 
-		pfs = append(pfs, propertyFilter.MakeCypher(startNodeName, propertyName))
+		c, err := propertyFilter.MakeCypher(startNodeName, propertyName)
+		if err != nil {
+			log.Fatalf("Err - %s", goutil.Pretty(err))
+		}
+
+		pfs = append(pfs, c)
+
 		props[propertyName] = propertyFilter.Value
 	}
+
 	if len(pfs) > 0 {
 		rows = append(rows, fmt.Sprintf("WHERE %s", strings.Join(pfs, ", ")))
 	}
@@ -70,8 +79,8 @@ func (filter *Filter) shallowCypher(
 		}
 		for _, step := range child.Path {
 
-			edgeIndex += 1
-			nodeIndex += 1
+			edgeIndex++
+			nodeIndex++
 			edgeName := getEdgeName(edgeIndex)
 			nodeName := getNodeName(nodeIndex)
 
